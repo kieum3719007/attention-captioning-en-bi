@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-BATCH_SIZE = 8
+BATCH_SIZE = 16
 IMAGE_INPUT_SHAPE = (3, 224, 224)
 train_step_signature = [
     tf.TensorSpec(shape=(BATCH_SIZE, *IMAGE_INPUT_SHAPE), dtype=tf.float32),

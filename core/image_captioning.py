@@ -79,7 +79,7 @@ def load_weight():
     CKPT.restore(CKPT_MANAGER.latest_checkpoint)
     print(f'Loaded checkpoint from {CHECKPOINT_PATH}')
 
-PHOBERT_NAME = 'roberta-base'
+PHOBERT_NAME = 'roberta-large'
 CHECKPOINT_PATH =osp.join("model", "bi-roberta-large-vit-32-224")
 
 
