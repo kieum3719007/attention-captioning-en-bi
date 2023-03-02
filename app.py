@@ -3,7 +3,8 @@ import os
 
 from flask import Flask, render_template, request
 from PIL import Image
-from core.captioner import CAPTIONER
+from core.captioner import CAPTIONER, Captioner
+from core.image_captioning import load_weight, MODEL
 from core.image_utils import preproccess_image
 
 app = Flask(__name__)
@@ -43,7 +44,13 @@ def get_prediction(image_bytes):
     """
     
     image = transform_image(image_bytes)
-    return CAPTIONER(image)
+    try:
+        return CAPTIONER(image)
+    except:
+        print("Reload weight")
+        load_weight()
+        CAPTIONER = Captioner(MODEL)
+        return CAPTIONER(image)
 
 
 def save_image(image_bytes):
