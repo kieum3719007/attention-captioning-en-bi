@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from core.image_captioning import TOKERNIZER, MODEL, create_model
+from core.image_captioning import TOKERNIZER
 
 
 START = TOKERNIZER.cls_token_id
@@ -10,7 +10,7 @@ class Captioner(tf.Module):
   def __init__(self, transformer):
     self.transformer = transformer
 
-  def __call__(self, image, max_length=40):
+  def __call__(self, image, max_length=80):
     # input sentence is portuguese, hence adding the start and end token
     image_input = self.transformer.image_preprocessor(image, return_tensors="tf")
     input_ids = tf.convert_to_tensor([[self.transformer.tokenizer.cls_token_id]], dtype=tf.int64)
@@ -39,6 +39,3 @@ class Captioner(tf.Module):
     tokens = self.transformer.tokenizer.convert_ids_to_tokens(output)
     text = self.transformer.tokenizer.convert_tokens_to_string(tokens)
     return text
-
-MODEL = create_model()
-CAPTIONER = Captioner(MODEL)

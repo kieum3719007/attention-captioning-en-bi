@@ -3,9 +3,10 @@ import os
 
 from flask import Flask, render_template, request
 from PIL import Image
-from core.captioner import CAPTIONER
+from core.captioner import Captioner
 from core.image_utils import preproccess_image
-
+from core.image_captioning import create_model
+CAPTIONER = Captioner(create_model())
 app = Flask(__name__)
 image_size = (224, 224)
 

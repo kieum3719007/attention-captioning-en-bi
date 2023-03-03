@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
-BATCH_SIZE = 1
+import os.path as osp
+BATCH_SIZE = 16
 IMAGE_INPUT_SHAPE = (3, 224, 224)
 train_step_signature = [
     tf.TensorSpec(shape=(BATCH_SIZE, *IMAGE_INPUT_SHAPE), dtype=tf.float32),
@@ -10,7 +11,15 @@ train_step_signature = [
 ]
 
 
-def train(model, _loss, optimizer, ckpt_manager):
+def train(model, _loss, optimizer):
+    
+    CKPT = tf.train.Checkpoint(model=model,
+                           optimizer=optimizer)
+    CHECKPOINT_PATH = osp.join("model", "bi-roberta-large-vit-32-224")
+    CKPT_MANAGER = tf.train.CheckpointManager(CKPT, CHECKPOINT_PATH, max_to_keep=5)
+    CKPT = tf.train.Checkpoint(model=model,
+                            optimizer=optimizer)
+    CKPT_MANAGER = tf.train.CheckpointManager(CKPT, CHECKPOINT_PATH, max_to_keep=5)
 
     @tf.function(input_signature=train_step_signature)
     def train_step(inp, seq, seq_bkw, mask):
@@ -53,11 +62,11 @@ def train(model, _loss, optimizer, ckpt_manager):
 
         return loss
 
-    for epoch in range(20):
+    for epoch in range(1):
         total_loss = 0
         total_step = 0
         print("\nStart of epoch %d" % (epoch + 1,))
-        for step in range(5):
+        for step in range(1):
             # print(inp/.shape)
             inp = np.random.uniform(0, 1, (BATCH_SIZE, 3, 224, 224))
             seq = np.random.randint(1, 100, size=(BATCH_SIZE, 40))
@@ -74,5 +83,5 @@ def train(model, _loss, optimizer, ckpt_manager):
         print("Loss of epoch %d is %.4f" % (epoch + 1, total_loss/total_step))
 
         if (epoch + 1) % 5 == 0:
-            ckpt_save_path = ckpt_manager.save()
+            ckpt_save_path = CKPT_MANAGER.save()
             print(f'Saving checkpoint for epoch {epoch+1} at {ckpt_save_path}')

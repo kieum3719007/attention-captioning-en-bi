@@ -86,17 +86,17 @@ class BiTransformerCaptioner(Model):
             return output
 
 
-def load_weight():
-    CKPT = tf.train.Checkpoint(MODEL)
-    CKPT_MANAGER = tf.train.CheckpointManager(
-        CKPT, CHECKPOINT_PATH, max_to_keep=5)
-    CKPT.restore(CKPT_MANAGER.latest_checkpoint)
+def load_weight(model):
+    cp = tf.train.Checkpoint(model=model,
+                             optimizer=OPTIMIZER)
+    cp_manager = tf.train.CheckpointManager(
+        cp, CHECKPOINT_PATH, max_to_keep=5)
+    cp.restore(cp_manager.latest_checkpoint)
     print(f'Loaded checkpoint from {CHECKPOINT_PATH}')
 
 
 PHOBERT_NAME = 'roberta-base'
 CHECKPOINT_PATH = osp.join("model", "bi-roberta-large-vit-32-224")
-
 
 # See all ViT models at https://huggingface.co/models?filter=vit
 VIT_MODELS = ["google/vit-base-patch32-384",
@@ -139,28 +139,17 @@ def loss_function(real, pred):
 LEARNING_RATE = 2e-5
 LOSS = loss_function
 OPTIMIZER = tf.keras.optimizers.legacy.Adam(LEARNING_RATE)
-MODEL = BiTransformerCaptioner(CONFIG)
-MODEL.compile(optimizer='adam', loss=LOSS)
-CKPT = tf.train.Checkpoint(model=MODEL,
-                           optimizer=OPTIMIZER)
 
-CKPT_MANAGER = tf.train.CheckpointManager(CKPT, CHECKPOINT_PATH, max_to_keep=5)
-CKPT = tf.train.Checkpoint(model=MODEL,
-                           optimizer=OPTIMIZER)
-CKPT_MANAGER = tf.train.CheckpointManager(CKPT, CHECKPOINT_PATH, max_to_keep=5)
 
-MODEL = None
 def create_model():
-
-    if MODEL == None:
-        MODEL = BiTransformerCaptioner(CONFIG)
-        MODEL.compile(optimizer='adam', loss=LOSS)
+    model = BiTransformerCaptioner(CONFIG)
+    model.compile(optimizer='adam', loss=LOSS)
 
     try:
-        load_weight()
-        train(MODEL, LOSS, OPTIMIZER, CKPT_MANAGER)
+        load_weight(model)
+        train(model, LOSS, OPTIMIZER)
     except:
         print("Load weight after train")
-        load_weight(MODEL)
-        
-    return MODEL
+        load_weight(model)
+
+    return model
