@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-BATCH_SIZE = 16
+BATCH_SIZE = 1
 IMAGE_INPUT_SHAPE = (3, 224, 224)
 train_step_signature = [
     tf.TensorSpec(shape=(BATCH_SIZE, *IMAGE_INPUT_SHAPE), dtype=tf.float32),
@@ -59,9 +59,9 @@ def train(model, _loss, optimizer, ckpt_manager):
         print("\nStart of epoch %d" % (epoch + 1,))
         for step in range(5):
             # print(inp/.shape)
-            inp = np.random.uniform(0, 1, (32, 3, 224, 224))
-            seq = np.random.randint(1, 100, size=(32, 40))
-            mask = np.random.randint(0, 1, size=(32, 40))
+            inp = np.random.uniform(0, 1, (BATCH_SIZE, 3, 224, 224))
+            seq = np.random.randint(1, 100, size=(BATCH_SIZE, 40))
+            mask = np.random.randint(0, 1, size=(BATCH_SIZE, 40))
             loss_value = train_step(inp, seq, seq, mask)
             if step % 50 == 0:
                 print(
