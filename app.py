@@ -55,3 +55,4 @@ def save_image(image_bytes):
     image = image.resize((500, 500))
 
     image.save(os.path.join("static", "images", "temp.png"))
+    
